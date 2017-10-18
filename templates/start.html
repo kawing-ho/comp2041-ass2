@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block body_contents %}
+<div class="unswtalk_student_details">
+
+<h2> Name&emsp;: {{student_details["full_name"]}} </h2>
+<h2> zID  &emsp;: {{student_details["zid"]}} </h2>
+<h2> D.O.B&emsp;: {{student_details["birthday"]}} </h2>
+<ul>
+{% for field in student_details %}
+	<li>{{field}} :  {{student_details[field]}}
+{% endfor %}
+</ul>
+</div>
+
+<form method="POST" action="">
+    <input type="hidden" name="n" value="7">
+    <input type="submit" value="Next student" class="unswtalk_button">
+</form>
+
+<!--
+Fields each profile should have
+
+full_name
+zid
+birthday
+home_suburb
+
+program
+friends
+
+
+password
+home_latitude
+-->
+
+
+{% endblock %}
+
+
