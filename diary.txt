@@ -1,3 +1,6 @@
 13/10/17	15:45	16:00	Setup	Setting up repo, scrutinizing starting code
 13/10/17	18:00	18:20	Setup	Looking at datasets etc, playing with website etc ...
 18/10/17	14:00	16:00	Coding	Started work for subset 0 
+19/10/17	12:30	13:30	Coding	Adding elements to base.html, tidying up the profile page, trying out port forwarding to help debugging
+24/10/17	14:00	14:15	Research	Reading class forum, moving folders into static and adding init script
+24/10/17	14:15	15:00	Coding	Tidying up base.html, thinking of adding login system soon

@@ -15,8 +15,15 @@
     font-size: x-large;
     font-weight: bold;
     color: blue;
+    /*display: inline-block*/
     text-decoration: underline;
     text-shadow: 1px 5px teal;
+}
+
+.unswtalk_heading_corner {
+	float:right;
+	text-align:right;
+	border: 1px solid black;
 }
 
 .unswtalk_user_details {

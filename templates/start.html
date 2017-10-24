@@ -4,10 +4,11 @@
 <div class="unswtalk_student_details">
 
 <h2> Name&emsp;: {{student_details["full_name"]}} </h2>
+<img src= "{{ image }}">
 <h2> zID  &emsp;: {{student_details["zid"]}} </h2>
 <h2> D.O.B&emsp;: {{student_details["birthday"]}} </h2>
 <ul>
-{% for field in student_details %}
+{% for field in student_details if field != "password"%}
 	<li>{{field}} :  {{student_details[field]}}
 {% endfor %}
 </ul>
@@ -15,8 +16,13 @@
 
 <form method="POST" action="">
     <input type="hidden" name="n" value="7">
+    <input type="hidden" name="username" value="{{student_details['zid']}}">
+    <input type="hidden" name="password" value="{{student_details['password']}}">
     <input type="submit" value="Next student" class="unswtalk_button">
 </form>
+<br\>
+<h3> Posts </h3>
+<hr>
 
 <!--
 Fields each profile should have

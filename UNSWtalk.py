@@ -5,38 +5,92 @@
 # https://cgi.cse.unsw.edu.au/~cs2041/assignments/UNSWtalk/
 
 import os, re
-from flask import Flask, render_template, session
+from flask import Flask, render_template, session, url_for, redirect, request
 
-students_dir = "dataset-medium";
+students_dir = "static/dataset-medium"
+all_possible_details = ["home_longitude", "friends", "email",
+                        "home_suburb", "birthday", "full_name", 
+                        "home_latitude", "program", "courses"]
 
 app = Flask(__name__)
 
-#Implement a login page later
-#if session not detected then redirect to login page
+@app.route('/feed', methods=['GET','POST'])
+def feed():
+    return render_template('base.html')
 
+#function which logs out the user
+@app.route('/logout',methods=['POST'])
+def logout():
+	#clear out the session
+	session.clear()
+	
+	#return them to the login page
+	return redirect(url_for('start'))
+	
 
+#function for login post request
+@app.route('/login', methods=['POST'])
+def login():
+	#if session is active then redirect 
+	if 'zid' in session:
+		return redirect(url_for('/start'))
+	
+	#--- AUTO-LOGIN for easy debugging ---#
+	session['zid'] = 1
+	
+	#sanitize input
+	
+	
+	#check if login doesn't match then return to page
+	# - not existant id
+	# - wrong password
+	
+	#if login matches
+	# - set session
+	
+	
+	# - redirect to home page / profile page
+	return redirect(url_for('start'))
+	
 
 #Show unformatted details for student "n".
 # Increment  n and store it in the session cookie
 @app.route('/', methods=['GET','POST'])
-@app.route('/start', methods=['GET','POST'])
+#@app.route('/start', methods=['GET','POST'])
 def start():
-    details = {}
-    n = session.get('n', 0)
-    students = sorted(os.listdir(students_dir))
-    student_to_show = students[n % len(students)]
-    details_filename = os.path.join(students_dir, student_to_show, "student.txt")
-    session['n'] = n + 1
-    with open(details_filename) as f:
-        #[details.append(line) for line in f]
-    #return render_template('start.html', student_details=details)
-        for line in f:
-        		match = re.search("([^\:]+):(.*)",line)
-        		key = match.group(1)
-        		value = match.group(2)
-        		details[key] = value		
-    return render_template('start.html', student_details=details)
+	
+	#if session is not found redirect to login 
+	if 'zid' not in session: return render_template('login.html')
+	 
+	details = {}
+	n = session.get('n', 0)
+	students = sorted(os.listdir(students_dir))
+	student_to_show = students[n % len(students)]
+	details_filename = os.path.join(students_dir, student_to_show, "student.txt")
+	session['n'] = n + 1
+	 
+	#Get text details from file
+	with open(details_filename) as f:
+	
+	    for line in f:
+	 	    match = re.search("([^\:]+): (.*)",line)
+	 	    key = match.group(1)
+	 	    value = match.group(2)
+	 	    details[key] = value
+	 		
+    #if details not found then put default string
+	default= "The user has chosen not so supply data for this field"
+	for field in all_possible_details:
+		if field not in details.keys():
+			details[field] = default
+        		
+	#Get image file
+	image_filename = os.path.join(students_dir, student_to_show, "img.jpg")
+	if(os.path.exists(image_filename) is False): #use default avatar if none found
+		image_filename = "static/avatar.jpg"
+		
+	return render_template('start.html', student_details=details, image=image_filename)
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
-    app.run(debug=True, port=1337)
+    app.run(debug=True, port=7331)

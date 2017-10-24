@@ -1,13 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <title>UNSWTalk</title>
 <link href="{{url_for('static', filename='UNSWtalk.css')}}") rel="stylesheet">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
 </head>
 <body>
 
 <div class="unswtalk_heading">
 	UNSWTalk
+</div>
+<div class="unswtalk_heading_corner">
+	Welcome Name ! 
+	
+	<form method="POST" action="logout">
+    <input type="submit" value="Logout" class="unswtalk_button">
+	</form>
+	
+	<!-- Profile picture here-->
+	<!-- clicking on either should bring to profile page-->
+	
+	<!-- username: z5190009 -->
+	<!-- password: xxxxxxxx -->
 </div>
 
 {% block body_contents %}
