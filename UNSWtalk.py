@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
-# written by andrewt@cse.unsw.edu.au October 2017
-# as a starting point for COMP[29]041 assignment 2
+# written by z5087077@cse.unsw.edu.au October 2017
 # https://cgi.cse.unsw.edu.au/~cs2041/assignments/UNSWtalk/
+# UNSWtalk social media website
 
 import os, re
 from flask import Flask, render_template, session, url_for, redirect, request
@@ -37,17 +37,33 @@ def login():
 	
 	#--- AUTO-LOGIN for easy debugging ---#
 	session['zid'] = 1
+	return redirect(url_for('start'))
+	#-------------------------------------#
 	
 	#sanitize input
-	
+	zid = request.form.get('zid', '')
+	attempt = request.form.get('password', '')
+	zid = re.sub(r'\W', '', zid)
 	
 	#check if login doesn't match then return to page
+	
 	# - not existant id
+	#print(zid)
+	if zid not in os.listdir(students_dir):
+		return render_template('login.html', error="Incorrect username or password")
+	
 	# - wrong password
+	students_file = os.path.join(students_dir, zid, "student.txt")
+	with open(students_file) as f:
+		password = re.search("password\s*:\s*(.*)",f.read()).group(1)
+	
+	#print(password)
+	if password != attempt:
+		return render_template('login.html', error="Incorrect username or password")
 	
 	#if login matches
 	# - set session
-	
+	session['zid'] = zid
 	
 	# - redirect to home page / profile page
 	return redirect(url_for('start'))

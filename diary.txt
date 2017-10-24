@@ -4,3 +4,5 @@
 19/10/17	12:30	13:30	Coding	Adding elements to base.html, tidying up the profile page, trying out port forwarding to help debugging
 24/10/17	14:00	14:15	Research	Reading class forum, moving folders into static and adding init script
 24/10/17	14:15	15:00	Coding	Tidying up base.html, thinking of adding login system soon
+24/10/17	15:00	17:00	Coding	Work on displaying user-info, authentication, styling (CSS)
+24/10/17	17:00	18:15	Research	Studying how to use Bootstrap, gathering ideas on how to use navbar/dropdowns/pagination 
