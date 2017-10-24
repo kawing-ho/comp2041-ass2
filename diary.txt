@@ -6,3 +6,5 @@
 24/10/17	14:15	15:00	Coding	Tidying up base.html, thinking of adding login system soon
 24/10/17	15:00	17:00	Coding	Work on displaying user-info, authentication, styling (CSS)
 24/10/17	17:00	18:15	Research	Studying how to use Bootstrap, gathering ideas on how to use navbar/dropdowns/pagination 
+24/10/17	19:00	23:59	Coding	Made the pretty navBar in base.html 
+25/10/17	00:00	00:30	Coding	Adding more stuff to navBar, other styling stuff 

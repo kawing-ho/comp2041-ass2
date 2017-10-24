@@ -4,6 +4,9 @@
 # https://cgi.cse.unsw.edu.au/~cs2041/assignments/UNSWtalk/
 # UNSWtalk social media website
 
+#Private information such e-mail, password, lat, long and courses should not be displayed.
+#The student's posts should be displayed in reverse chronological order. 
+
 import os, re
 from flask import Flask, render_template, session, url_for, redirect, request
 
@@ -19,7 +22,7 @@ def feed():
     return render_template('base.html')
 
 #function which logs out the user
-@app.route('/logout',methods=['POST'])
+@app.route('/logout',methods=['GET','POST'])
 def logout():
 	#clear out the session
 	session.clear()

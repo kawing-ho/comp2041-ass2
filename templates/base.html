@@ -2,31 +2,80 @@
 <html lang="en">
 
 <head>
-<title>UNSWTalk</title>
-<link href="{{url_for('static', filename='UNSWtalk.css')}}") rel="stylesheet">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+<!-- <link href="{{url_for('static', filename='UNSWtalk.css')}}") rel="stylesheet"> -->
+<link href="static/UNSWtalk.css") rel="stylesheet">
+<title>UNSWTalk ¯\_(ツ)_/¯</title>
 </head>
 <body>
 
-<div class="unswtalk_heading">
-	UNSWTalk
-</div>
-<div class="unswtalk_heading_corner">
-	Welcome Name ! 
-	
-	<form method="POST" action="logout">
-    <input type="submit" value="Logout" class="unswtalk_button">
-	</form>
-	
-	<!-- Profile picture here-->
-	<!-- clicking on either should bring to profile page-->
-	
-	<!-- username: z5190009 -->
-	<!-- password: xxxxxxxx -->
-</div>
-
+    <!-- Static navbar -->
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">
+          
+          	<kbd><strong>UNSW</strong><sup> </sup><small>Talk</small></kbd>
+          </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+          
+            <li class="divider-vertical"></li>
+            
+            <li>
+              <a href="#">
+                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                <strong>Settings</strong>
+              </a>
+            </li>
+            
+            <li>
+              <form class="navbar-form" method="POST" action="#">
+                <div class="form-group">
+            	  <input type="text" class="search_box" maxlength="40" placeholder="Search for a user ...">
+                </div>
+            	  <button class="btn btn-sm">
+            	  <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+            	  <strong> Search</strong>
+            	</button>
+              </form>
+            </li>
+            
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+          
+          	<li class="divider-vertical"></li>
+          	
+            <li>
+              <a href="#">
+                <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+                <strong>Home</strong>
+              </a>
+            </li>
+            
+            <li><a href="/logout">
+              <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
+              <strong>Logout</strong>
+            </a></li>  
+          </ul>
+        </div>
+      </div>
+    </nav>
+    
 {% block body_contents %}
 {% endblock %}
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -2,6 +2,8 @@
  * written by z5087077@cse.unsw.edu.au October 2017
  * Some bootstrap used as well : ? 
  */
+ 
+ /* UNSW colour: #ffe738 (close enough) */
 
 .unswtalk_heading {
     padding-top: 1em;
@@ -15,28 +17,27 @@
     text-shadow: 1px 5px teal;
 }
 
-body {
-	background-color: yellow;
+
+/* Got this from https://stackoverflow.com/a/21352749 */
+.divider-vertical {
+	height: 50px;
+	margin: 0 9px;
+	border-left: 1px solid #F2F2F2;
+	border-right:1px solid #FFF;
 }
 
-.unswtalk_heading_corner {
-	float:right;
-	text-align:right;
-	border: 1px solid black;
+.search_box {
+	width: 16em;
+	height: 2.25em;
 }
 
-.unswtalk_user_details {
-    background-color: #ABCDEF;
-    color: #204142;
-    white-space: pre;
-    border:thin solid #204142;
-    border-radius: 1em;
-    padding-left: 0.42em;
+.navbar-static-top {
+	background-color: #ffe738;
 }
 
 .unswtalk_button {
-    background-color: #ffff00; /*#ffff00 -- #FEDBCA*/
-    border:thin solid #904142;
+    background-color: #ffe738; /*#ffff00 -- #FEDBCA*/
+    border:thick solid #000000;
     border-radius: 0.42em;
-    color: #904142;
+    color: black;
 }
