@@ -17,6 +17,26 @@
     text-shadow: 1px 5px teal;
 }
 
+.li-tabs {
+	font-size: medium;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus{
+	color: white;
+	background-color: black;  
+} 
+
+
+.li-tabs > li > a:hover,
+.nav>li>a:focus,
+.nav>li>a:hover 
+{
+	color: white;
+	background-color: black;
+}
+
 .jumbotron {
 	color: white;
 	background-color: black;

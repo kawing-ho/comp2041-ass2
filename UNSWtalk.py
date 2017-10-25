@@ -25,10 +25,8 @@ def parseBirthday(bday):
 	
 	month = month.lstrip("0")
 	
-	print(month)
 	month = {"1":"January","2":"February","3":"March","4":"April","5":"May","6":"June","7":"July",
 	         "8":"August","9":"September","10":"October","11":"November","12":"December"}.get(month,"NEIN")
-	print(month)
 	
 	newString = day + " " + month + " " + year
 	
@@ -123,6 +121,11 @@ def start():
 			details[field] = "-"
 	#parse birthday
 	details["birthday"] = parseBirthday(details["birthday"])
+	
+	#convert friends string into a proper list
+	friendStr = details["friends"].replace("(",'').replace(")",'').replace(",",'')
+	friends = friendStr.split(" ")
+	details["friends"] = friends
        		
 	#Get image file
 	image_filename = os.path.join(students_dir, student_to_show, "img.jpg")
@@ -131,6 +134,41 @@ def start():
 		
 	return render_template('start.html', student_details=details,
                            image=image_filename, fullname=details['full_name'])
+
+@app.context_processor
+def my_utility_processor():
+	
+	#returns dictionary of info for friends list / posts / comments / replies
+	def getInfo(zid):
+	
+		details_filename = os.path.join(students_dir, zid, "student.txt")
+		details = {}
+		#Get text details from file
+		with open(details_filename) as f:
+	
+			for line in f:
+				match = re.search("([^\:]+): (.*)",line)
+				key = match.group(1)
+				value = match.group(2)
+				details[key] = value
+				
+		#set default values
+		for field in all_possible_details:
+			if field not in details.keys():
+				details[field] = "-"
+	 	    	
+	 	#get image as well
+		image = os.path.join(students_dir, zid, "img.jpg")
+		if(os.path.exists(image) is False): #use default avatar if none found
+			image = "static/avatar.jpg"
+			
+		details["image"] = image
+		return details
+	#-------------------------------------------------
+	
+	return dict(getInfo=getInfo)
+	
+
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)

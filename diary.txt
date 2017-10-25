@@ -6,8 +6,11 @@
 24/10/17	14:15	15:00	Coding	Tidying up base.html, thinking of adding login system soon
 24/10/17	15:00	17:00	Coding	Work on displaying user-info, authentication, styling (CSS)
 24/10/17	17:00	18:15	Research	Studying how to use Bootstrap, gathering ideas on how to use navbar/dropdowns/pagination 
-24/10/17	19:00	23:59	Coding	Made the pretty navBar in base.html 
+24/10/17	19:00	23:59	Debugging/Styling	Made the pretty navBar in base.html 
 25/10/17	00:00	00:30	Coding	Adding more stuff to navBar, other styling stuff 
 25/10/17	11:30	12:45	Coding	Adding jumbotron and containers for the profile page
-25/10/17	17:30	18:20	Coding	Finishing up on Jumpbotron, need to align the profile image properly
+25/10/17	17:30	18:20	Debugging	Finishing up on Jumpbotron, need to align the profile image properly
 25/10/17	20:20	21:20	Coding	Working on friends list
+25/10/17	21:30	23:40	Styling/Coding	Did lots of styling, adding tabs and finally implemented the friends list
+25/10/17	23:40	23:59	Coding	Time to restructure the app routing to have /u/zid format and start linking profiles
+26/10/17	00:00	01:00	Coding 	Ditto
