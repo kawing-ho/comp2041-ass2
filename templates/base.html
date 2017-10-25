@@ -8,7 +8,7 @@
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 <!-- <link href="{{url_for('static', filename='UNSWtalk.css')}}") rel="stylesheet"> -->
 <link href="static/UNSWtalk.css") rel="stylesheet">
-<title>UNSWTalk ¯\_(ツ)_/¯</title>
+<title>UNSWTalk{% block title %}{% endblock %}</title>
 </head>
 <body>
 
@@ -30,7 +30,7 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
           
-            <li class="divider-vertical"></li>
+            <li class="divider-vertical hidden-sm hidden-xs"></li>
             
             <li>
               <a href="#">
@@ -54,7 +54,15 @@
           </ul>
           <ul class="nav navbar-nav navbar-right">
           
-          	<li class="divider-vertical"></li>
+          	<li>
+              <a href="#">
+                
+                	<img src= "{{ image }}" class="img-circle" alt="profile pic" height="20" width="20">
+                	 <span class="label label-default">{{ fullname }}</span>
+              </a>
+            </li>
+            
+          	<li class="divider-vertical hidden-sm hidden-xs"></li>
           	
             <li>
               <a href="#">
@@ -63,7 +71,7 @@
               </a>
             </li>
             
-            <li><a href="/logout">
+            <li><a href="{{ url_for('logout') }}">
               <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
               <strong>Logout</strong>
             </a></li>  

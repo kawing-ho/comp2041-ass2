@@ -17,6 +17,23 @@
     text-shadow: 1px 5px teal;
 }
 
+.jumbotron {
+	color: white;
+	background-color: black;
+}
+
+.img-thumbnail {
+	width: 150px;
+	height: 150px;
+	object-fit: cover;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+/*Got this from https://stackoverflow.com/a/35063374*/
+.img-circle {
+	object-fit: cover;
+}
 
 /* Got this from https://stackoverflow.com/a/21352749 */
 .divider-vertical {

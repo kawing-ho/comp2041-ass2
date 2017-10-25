@@ -8,3 +8,4 @@
 24/10/17	17:00	18:15	Research	Studying how to use Bootstrap, gathering ideas on how to use navbar/dropdowns/pagination 
 24/10/17	19:00	23:59	Coding	Made the pretty navBar in base.html 
 25/10/17	00:00	00:30	Coding	Adding more stuff to navBar, other styling stuff 
+25/10/17	11:30	12:45	Coding	Adding jumbotron and containers for the profile page

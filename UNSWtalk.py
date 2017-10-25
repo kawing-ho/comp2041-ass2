@@ -108,7 +108,8 @@ def start():
 	if(os.path.exists(image_filename) is False): #use default avatar if none found
 		image_filename = "static/avatar.jpg"
 		
-	return render_template('start.html', student_details=details, image=image_filename)
+	return render_template('start.html', student_details=details,
+                           image=image_filename, fullname=details['full_name'])
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
