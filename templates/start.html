@@ -5,37 +5,52 @@
 {% block body_contents %}
 
 <div class="container">
-
-      <!-- Main component for a primary marketing message or call to action -->
-      <div class="jumbotron">
-        <h1>{{student_details["full_name"]}} <small><kbd>{{student_details["zid"]}}</kbd></small></h1>
-        <h2>{{student_details["birthday"]}}</h2>
-        <p>This example is a quick exercise to illustrate how the default, static and fixed to top navbar work. 
-           It includes the responsive CSS and HTML, so it also adapts to your viewport and device.</p>
-        <p>To see the difference between static and fixed top navbars, just scroll.</p>
-        <p>
-          <a class="btn btn-lg btn-primary" href="{{ url_for('start') }}" role="button">View navbar docs &raquo;</a>
-        </p>
+    <div class="jumbotron">
+        <div class="row">
+            <div class="col-md-8 col-sm-16">
+        		<h1>{{student_details["full_name"]}} <small><kbd>{{student_details["zid"]}}</kbd></small></h1>
+        
+       		 	<h2>Date Of Birth:
+            		{% if student_details["birthday"] == "-" %}
+            		    <abbr title="The user has chosen not so supply data for this field"><strong>-</strong></abbr>
+            		{% else %}
+             	   		{{student_details["birthday"]}}
+           	 		{% endif %}
+        		</h2>
+        
+        		<h2>Residing in: 
+            		{% if student_details["home_suburb"] == "-" %}
+            		    <abbr title="The user has chosen not so supply data for this field"><strong>-</strong></abbr>
+            		{% else %}
+            		    {{student_details["home_suburb"]}}
+            		{% endif %}
+        		</h2>
+        
+        
+        		<h2>Studying:
+            		{% if student_details["program"] == "-" %}
+            		    <abbr title="The user has chosen not so supply data for this field"><strong>-</strong></abbr>
+            		{% else %}
+            	    	{{student_details["program"]}}
+            		{% endif %}
+        		</h2>
+        	</div>
+        	
+        	<div class="col-md-4 col-sm-8">
+        		<img src= "{{ image }}" class="img-rounded" alt="profile pic" height="300" width="300">
+        	</div>
+        	
+        	
+        </div> <!-- /row -->
+        
+        <div class="row">
+        	<blockquote>
+          		<a class="btn btn-lg btn-default" href="{{ url_for('start') }}" role="button">Next</a>
+        	</blockquote>
+        </div>
       </div>
 
-</div> <!-- /container -->
-
-
-
-
-
-<div class="unswtalk_student_details">
-
-<h2> Name&emsp;: {{student_details["full_name"]}} </h2>
-<img src= "{{ image }}" class="img-thumbnail" width="200" height="200">
-<h2> zID  &emsp;: {{student_details["zid"]}} </h2>
-<h2> D.O.B&emsp;: {{student_details["birthday"]}} </h2>
-<ul>
-{% for field in student_details if field != "password"%}
-	<li>{{field}} :  {{student_details[field]}}
-{% endfor %}
-</ul>
-</div>
+</div> <!-- /container & jumbotron -->
 
 <form method="POST" action="">
     <input type="hidden" name="n" value="7">
@@ -43,25 +58,11 @@
     <input type="hidden" name="password" value="{{student_details['password']}}">
     <input type="submit" value="Next student" class="unswtalk_button">
 </form>
+
 <br\>
 <h3> Posts </h3>
 <hr>
 
-<!--
-Fields each profile should have
-
-full_name
-zid
-birthday
-home_suburb
-
-program
-friends
-
-
-password
-home_latitude
--->
 
 
 {% endblock %}

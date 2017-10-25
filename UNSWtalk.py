@@ -17,6 +17,25 @@ all_possible_details = ["home_longitude", "friends", "email",
 
 app = Flask(__name__)
 
+#parse birthday into a more human friendly format
+def parseBirthday(bday):
+	if(bday == "-"): return bday
+	
+	(year, month, day) = bday.split("-")
+	
+	month = month.lstrip("0")
+	
+	print(month)
+	month = {"1":"January","2":"February","3":"March","4":"April","5":"May","6":"June","7":"July",
+	         "8":"August","9":"September","10":"October","11":"November","12":"December"}.get(month,"NEIN")
+	print(month)
+	
+	newString = day + " " + month + " " + year
+	
+	return newString
+	
+
+
 @app.route('/feed', methods=['GET','POST'])
 def feed():
     return render_template('base.html')
@@ -98,11 +117,13 @@ def start():
 	 	    details[key] = value
 	 		
     #if details not found then put default string
-	default= "The user has chosen not so supply data for this field"
+	#"The user has chosen not so supply data for this field"
 	for field in all_possible_details:
 		if field not in details.keys():
-			details[field] = default
-        		
+			details[field] = "-"
+	#parse birthday
+	details["birthday"] = parseBirthday(details["birthday"])
+       		
 	#Get image file
 	image_filename = os.path.join(students_dir, student_to_show, "img.jpg")
 	if(os.path.exists(image_filename) is False): #use default avatar if none found
