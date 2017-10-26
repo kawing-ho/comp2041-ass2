@@ -26,6 +26,21 @@ def checkLogin():
 def whoAmI():
 	return session["zid"]
 
+#compare function for sorting by datetime
+def time_compare(a,b):
+
+	#get the times
+	aTime = a[2]
+	bTime = b[2]
+	
+	print(aTime)
+	print(bTime)
+	#convert to dateTime format and compare 
+
+
+
+	return 0
+
 #parse birthday into a more human friendly format
 def parseBirthday(bday):
 	if(bday == "-"): return bday
@@ -74,7 +89,6 @@ def login():
 	
 	#--- AUTO-LOGIN for easy debugging ---#
 	session['zid'] = "z5196487"
-	#return redirect(url_for('profile', zid=whoAmI()))
 	return redirect(url_for('feed'))
 	#-------------------------------------#
 	
@@ -122,7 +136,6 @@ def profile(zid=None):
 	
 	if zid is None: zid = whoAmI()
 	details = {}
-	print("From Profile: getting info of " + zid)
 	details_filename = os.path.join(students_dir, zid, "student.txt")
 	 
 	#Get text details from file
@@ -157,6 +170,64 @@ def profile(zid=None):
 	if(os.path.exists(checkImage) is False): #use default avatar if none found
 		image = "avatar.jpg"
 		
+		
+	#Retrieve and order the posts 
+	# ... need to extend to include comments and replies as well
+	
+	postList = []
+	commentList = []
+	replyList = []
+	
+	content_path = os.path.join(students_dir, zid)
+	for content in os.listdir(content_path):
+		if(content == "student.txt" or content == "img.jpg"): continue
+		filename = os.path.join(content_path, content)
+		try:
+			with open(filename) as f:
+				data = f.read()
+		except Exception as e:
+			print("Content file",e)
+				
+		sender = re.search("from: (\w+)",data).group(1)			#get zid
+		time = re.search("time: ([\w:\+\-]+)",data).group(1)	#get Date
+		message = re.search("message: (.*)",data).group(1)		#get message
+		parent = None
+		self = re.search("-?(\d+)\.txt$",content).group(1)
+		type = "post"
+				
+		#if its a comment then the parent number is left of slash
+		comment = re.compile('^\d+\-\d+\.txt$')
+		if comment.match(content):
+			type = "comment"
+			parent = re.search("^(\d+)\-\d+\.txt$",content).group(1)
+				
+		#if its a reply then the parent number is between two slashes
+		reply = re.compile('^\d+\-\d+\-\d+.txt$')
+		if reply.match(content):
+			type = "reply"
+			parent = re.search("^\d+\-(\d+)\-\d+.txt$",content).group(1)
+				
+		element = (parent, self, time, sender, message)
+				
+		if(type == "post"): postList.append(element)
+		elif(type == "comment"): commentList.append(element)
+		elif(type == "reply"): replyList.append(element)
+		else: print("ERROR IN CONTENT")
+				
+		print(content, parent, self, type)
+		print(sender)
+		print(time)
+		print(message)
+		print("--------")
+				
+		#postList.sort(time_compare)
+		#commentList.sort(time_compare)
+		#replyList.sort(time_compare)
+			
+
+	
+	
+		
 	return render_template('profile.html', zid=zid, student_details=details, image=image)
 
 @app.context_processor
@@ -164,7 +235,6 @@ def my_utility_processor():
 	
 	#returns dictionary of info for friends list / posts / comments / replies
 	def getInfo(zid):
-		print("From JINJA: getting info of " + zid)
 		details_filename = os.path.join(students_dir, zid, "student.txt")
 		details = {}
 		#Get text details from file

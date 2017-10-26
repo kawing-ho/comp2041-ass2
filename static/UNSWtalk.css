@@ -94,3 +94,34 @@
     border-radius: 0.42em;
     color: black;
 }
+
+
+/* Got this from https://cpratt.co/twitter-bootstrap-callout-css-styles/ */
+
+.bs-callout {
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #eee; /* original: eee */
+    border-left-width: 5px;
+    border-radius: 3px;
+}
+.bs-callout h4, h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+.bs-callout p:last-child {
+    margin-bottom: 0;
+}
+.bs-callout code {
+    border-radius: 3px;
+}
+.bs-callout+.bs-callout {
+    margin-top: -5px;
+}
+.bs-callout-default {
+    border-left-color: #000; /* og 777 */
+}
+.bs-callout-default h4 {
+    color: #000; /* og 777 */
+}
+
