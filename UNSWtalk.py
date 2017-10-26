@@ -22,30 +22,27 @@ def parseBirthday(bday):
 	if(bday == "-"): return bday
 	
 	(year, month, day) = bday.split("-")
-	
 	month = month.lstrip("0")
-	
 	month = {"1":"January","2":"February","3":"March","4":"April","5":"May","6":"June","7":"July",
 	         "8":"August","9":"September","10":"October","11":"November","12":"December"}.get(month,"NEIN")
 	
-	newString = day + " " + month + " " + year
-	
-	return newString
+	return (day + " " + month + " " + year)
 	
 
-
+#feeds are specific to each user logged in ! 
 @app.route('/feed', methods=['GET','POST'])
 def feed():
-    return render_template('base.html')
+	currentUser = whoAmI()
+	return render_template('feed.html')
 
 #function which logs out the user
-@app.route('/logout',methods=['GET','POST'])
+@app.route('/logout',methods=['POST'])
 def logout():
 	#clear out the session
 	session.clear()
 	
-	#return them to the login page
-	return redirect(url_for('start'))
+	#return them to the login page (via profile page)
+	return redirect(url_for('profile'))
 	
 
 #function for login post request
@@ -53,11 +50,11 @@ def logout():
 def login():
 	#if session is active then redirect 
 	if 'zid' in session:
-		return redirect(url_for('/start'))
+		return redirect(url_for('profile'))
 	
 	#--- AUTO-LOGIN for easy debugging ---#
-	session['zid'] = 1
-	return redirect(url_for('start'))
+	session['zid'] = "z5196487"
+	return redirect(url_for('profile'))
 	#-------------------------------------#
 	
 	#sanitize input
@@ -67,8 +64,7 @@ def login():
 	
 	#check if login doesn't match then return to page
 	
-	# - not existant id
-	#print(zid)
+	# - non existant id
 	if zid not in os.listdir(students_dir):
 		return render_template('login.html', error="Incorrect username or password")
 	
@@ -77,7 +73,6 @@ def login():
 	with open(students_file) as f:
 		password = re.search("password\s*:\s*(.*)",f.read()).group(1)
 	
-	#print(password)
 	if password != attempt:
 		return render_template('login.html', error="Incorrect username or password")
 	
@@ -86,24 +81,20 @@ def login():
 	session['zid'] = zid
 	
 	# - redirect to home page / profile page
-	return redirect(url_for('start'))
+	return redirect(url_for('feed'))
 	
 
 #Show unformatted details for student "n".
 # Increment  n and store it in the session cookie
 @app.route('/', methods=['GET','POST'])
-#@app.route('/start', methods=['GET','POST'])
-def start():
+@app.route('/user/<zid>')
+def profile(zid=None):
 	
 	#if session is not found redirect to login 
 	if 'zid' not in session: return render_template('login.html')
-	 
+	if zid is None: zid = whoAmI()
 	details = {}
-	n = session.get('n', 0)
-	students = sorted(os.listdir(students_dir))
-	student_to_show = students[n % len(students)]
-	details_filename = os.path.join(students_dir, student_to_show, "student.txt")
-	session['n'] = n + 1
+	details_filename = os.path.join(students_dir, zid, "student.txt")
 	 
 	#Get text details from file
 	with open(details_filename) as f:
@@ -119,6 +110,7 @@ def start():
 	for field in all_possible_details:
 		if field not in details.keys():
 			details[field] = "-"
+			
 	#parse birthday
 	details["birthday"] = parseBirthday(details["birthday"])
 	
@@ -128,12 +120,12 @@ def start():
 	details["friends"] = friends
        		
 	#Get image file
-	image_filename = os.path.join(students_dir, student_to_show, "img.jpg")
+	image_filename = os.path.join(students_dir, zid, "img.jpg")
 	if(os.path.exists(image_filename) is False): #use default avatar if none found
 		image_filename = "static/avatar.jpg"
 		
 	return render_template('start.html', student_details=details,
-                           image=image_filename, fullname=details['full_name'])
+                           image=image_filename,)
 
 @app.context_processor
 def my_utility_processor():
@@ -166,7 +158,11 @@ def my_utility_processor():
 		return details
 	#-------------------------------------------------
 	
-	return dict(getInfo=getInfo)
+	def whoAmI():
+		return session["zid"]
+	
+	
+	return dict(getInfo=getInfo,whoAmI=whoAmI)
 	
 
 

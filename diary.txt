@@ -14,3 +14,4 @@
 25/10/17	21:30	23:40	Styling/Coding	Did lots of styling, adding tabs and finally implemented the friends list
 25/10/17	23:40	23:59	Coding	Time to restructure the app routing to have /u/zid format and start linking profiles
 26/10/17	00:00	01:00	Coding 	Ditto
+26/10/17	15:20	18:20	Coding	Setting up posts display 

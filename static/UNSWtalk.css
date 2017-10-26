@@ -37,7 +37,22 @@
 	background-color: black;
 }
 
-.jumbotron {
+.label-default {
+	color: white;
+	background-color: black;
+	font-size: small;
+}
+
+.logo {
+	font-size: x-large;
+}
+
+.label-info {
+	color: black;
+	background-color: #ffe738;
+}
+
+.jumbotron, .badge {
 	color: white;
 	background-color: black;
 }
@@ -49,6 +64,7 @@
 	background-position: center center;
 	background-repeat: no-repeat;
 }
+
 
 /*Got this from https://stackoverflow.com/a/35063374*/
 .img-circle {

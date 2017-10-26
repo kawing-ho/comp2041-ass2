@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-<!-- <link href="{{url_for('static', filename='UNSWtalk.css')}}") rel="stylesheet"> -->
 <link href="static/UNSWtalk.css") rel="stylesheet">
 <title>UNSWTalk{% block title %}{% endblock %}</title>
 </head>
@@ -23,8 +22,9 @@
             <span class="icon-bar"></span>
           </button>
           <a class="navbar-brand" href="#">
-          
-          	<kbd><strong>UNSW</strong><sup> </sup><small>Talk</small></kbd>
+          	<div class="logo">
+          		<kbd><strong>UNSW</strong><sup> </sup><small>Talk</small></kbd>
+          	</div>
           </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
@@ -56,9 +56,10 @@
           
           	<li>
               <a href="#">
-                
-                	<img src= "{{ image }}" class="img-circle" alt="profile pic" height="20" width="20">
-                	 <span class="label label-default">{{ fullname }}</span>
+                	{% set me = whoAmI() %}
+                	{% set my_details = getInfo(me) %}
+                	<img src= "{{ my_details['image'] }}" class="img-circle" alt="profile pic" height="20" width="20">
+                	 <span class="label label-default">{{ my_details['full_name'] }}</span>
               </a>
             </li>
             
