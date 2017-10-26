@@ -26,21 +26,6 @@ def checkLogin():
 def whoAmI():
 	return session["zid"]
 
-#compare function for sorting by datetime
-def time_compare(a,b):
-
-	#get the times
-	aTime = a[2]
-	bTime = b[2]
-	
-	print(aTime)
-	print(bTime)
-	#convert to dateTime format and compare 
-
-
-
-	return 0
-
 #parse birthday into a more human friendly format
 def parseBirthday(bday):
 	if(bday == "-"): return bday
@@ -190,8 +175,11 @@ def profile(zid=None):
 				
 		sender = re.search("from: (\w+)",data).group(1)			#get zid
 		time = re.search("time: ([\w:\+\-]+)",data).group(1)	#get Date
-		message = re.search("message: (.*)",data).group(1)		#get message
+		m = re.search("message: (.*)",data)
+		message = "" if(m is None) else m.group(1)				#get message
+		message = message.replace("\\n","<br \>")
 		parent = None
+		root = None
 		self = re.search("-?(\d+)\.txt$",content).group(1)
 		type = "post"
 				
@@ -205,30 +193,31 @@ def profile(zid=None):
 		reply = re.compile('^\d+\-\d+\-\d+.txt$')
 		if reply.match(content):
 			type = "reply"
-			parent = re.search("^\d+\-(\d+)\-\d+.txt$",content).group(1)
+			m = re.search("(^\d)+\-(\d+)\-\d+.txt$",content)
+			root = m.group(1)
+			parent = m.group(2)
 				
-		element = (parent, self, time, sender, message)
+		element = (time, parent, self, sender, message, root)
 				
 		if(type == "post"): postList.append(element)
 		elif(type == "comment"): commentList.append(element)
 		elif(type == "reply"): replyList.append(element)
 		else: print("ERROR IN CONTENT")
 				
+		#delete later
 		print(content, parent, self, type)
 		print(sender)
 		print(time)
 		print(message)
 		print("--------")
 				
-		#postList.sort(time_compare)
-		#commentList.sort(time_compare)
-		#replyList.sort(time_compare)
-			
-
-	
-	
+	postList.sort()
+	commentList.sort()
+	replyList.sort()
 		
-	return render_template('profile.html', zid=zid, student_details=details, image=image)
+	return render_template('profile.html', zid=zid, student_details=details, image=image,
+                                           postList=postList, commentList=commentList,
+                                           replyList=replyList)
 
 @app.context_processor
 def my_utility_processor():
@@ -266,9 +255,14 @@ def my_utility_processor():
 	
 	def whoAmI():
 		return session["zid"]
+
+	#returns a more user-friendly version of time string
+	#expand this later !
+	def fixTime(time):
+		return time
 	
 	
-	return dict(getInfo=getInfo,whoAmI=whoAmI)
+	return dict(getInfo=getInfo, whoAmI=whoAmI, fixTime=fixTime)
 	
 
 
