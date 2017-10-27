@@ -9,6 +9,7 @@
 
 import os, re
 from flask import Flask, render_template, session, url_for, redirect, request
+from datetime import datetime as dt
 
 students_dir = "static/dataset-medium"
 static_dir = students_dir.replace("static/",'')
@@ -36,6 +37,39 @@ def parseBirthday(bday):
 	         "8":"August","9":"September","10":"October","11":"November","12":"December"}.get(month,"NEIN")
 	
 	return (day + " " + month + " " + year)
+	
+#returns dictionary of info for friends list / posts / comments / replies
+def getInfo(zid):
+	details_filename = os.path.join(students_dir, zid, "student.txt")
+	details = {}
+	#Get text details from file
+	try:
+		with open(details_filename) as f:
+			for line in f:
+				match = re.search("([^\:]+): (.*)",line)
+				key = match.group(1)
+				value = match.group(2)
+				details[key] = value
+	except Exception as e: print(e)
+	
+	#set default values
+	for field in all_possible_details:
+		if field not in details.keys():
+			details[field] = "-"
+ 	    	
+ 	#get image as well
+	image = os.path.join(static_dir, zid, "img.jpg")
+	checkImage = os.path.join(students_dir, zid, "img.jpg")
+	if(os.path.exists(checkImage) is False): #use default avatar if none found
+		image = "avatar.jpg"
+			
+	details["image"] = image
+	return details
+#-------------------------------------------------
+	
+	
+	
+	
 	
 @app.route('/results', methods=['POST'])
 def results():
@@ -182,7 +216,20 @@ def profile(zid=None):
 		root = None
 		self = re.search("-?(\d+)\.txt$",content).group(1)
 		type = "post"
+		
+
+		if(re.match("z\d+", message)): 
+			print(message)
+			for tagged in re.findall("z\d+", message):
+				#tagged is still a zid here
 				
+				details = getInfo(tagged.lstrip().rstrip())
+				print(tagged)
+				#print(tagged,"-",details["full_name"])
+				
+				
+			print("--------")
+		
 		#if its a comment then the parent number is left of slash
 		comment = re.compile('^\d+\-\d+\.txt$')
 		if comment.match(content):
@@ -193,7 +240,7 @@ def profile(zid=None):
 		reply = re.compile('^\d+\-\d+\-\d+.txt$')
 		if reply.match(content):
 			type = "reply"
-			m = re.search("(^\d)+\-(\d+)\-\d+.txt$",content)
+			m = re.search("(^\d+)\-(\d+)\-\d+.txt$",content)
 			root = m.group(1)
 			parent = m.group(2)
 				
@@ -203,17 +250,11 @@ def profile(zid=None):
 		elif(type == "comment"): commentList.append(element)
 		elif(type == "reply"): replyList.append(element)
 		else: print("ERROR IN CONTENT")
-				
-		#delete later
-		print(content, parent, self, type)
-		print(sender)
-		print(time)
-		print(message)
-		print("--------")
-				
-	postList.sort()
-	commentList.sort()
-	replyList.sort()
+	
+	#sort chronologically means most recent first
+	postList.sort(reverse=True)
+	commentList.sort(reverse=True)
+	replyList.sort(reverse=True)
 		
 	return render_template('profile.html', zid=zid, student_details=details, image=image,
                                            postList=postList, commentList=commentList,
@@ -257,8 +298,11 @@ def my_utility_processor():
 		return session["zid"]
 
 	#returns a more user-friendly version of time string
-	#expand this later !
+	#expand this later !    (2016-09-29T11:05:03+0000)
 	def fixTime(time):
+		
+		t = dt.strptime(time, "%Y-%m-%dT%H:%M:%S+0000")
+		time = t.strftime('%I:%M %p / %d %b %Y').lstrip('0')
 		return time
 	
 	

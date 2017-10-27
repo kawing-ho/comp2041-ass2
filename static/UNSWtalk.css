@@ -21,6 +21,40 @@
 	font-size: medium;
 }
 
+/* profile pictures in friends list */
+.profile {
+	height: 40px;
+	width: 40px;
+	border:thick solid;
+	border-color: #3963ce;
+	border-width: 1px;
+}
+
+/*for profile image in base.html */
+.base {
+	padding: 0px;
+	margin: 0px;
+	border:thick solid;
+	border-color: #56ff6a;
+	border-width: 1px;
+}
+
+.name {
+	margin: 0px;
+	padding: 5px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+
+}
+
+.posts {
+	height: 50px;
+	width: 50px;
+	border:thick solid #ffe738;
+	border-color: #000;
+	border-width: 1px;
+}
+
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus{
@@ -65,6 +99,9 @@
 	background-repeat: no-repeat;
 }
 
+a, a:hover {
+	color: inherit;
+} 
 
 /*Got this from https://stackoverflow.com/a/35063374*/
 .img-circle {
@@ -99,8 +136,11 @@
 /* Got this from https://cpratt.co/twitter-bootstrap-callout-css-styles/ */
 
 .bs-callout {
-    padding: 20px;
-    margin: 20px 0;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+    padding-left: 50px;
+    margin: 10px 0;
     border: 1px solid #eee; /* original: eee */
     border-left-width: 5px;
     border-radius: 3px;
@@ -123,5 +163,41 @@
 }
 .bs-callout-default h4 {
     color: #000; /* og 777 */
+}
+
+.post {
+	border-width: 3px;
+	border-color: #000; /* og 777 */
+	padding-bottom:20px;
+	/*background-color: #ffe738;*/
+}
+
+.comment {
+	border-left-color: #777;
+	padding-bottom:15px;
+	padding-left: 20px;
+	margin-bottom:20px;
+	/*background-color:#ffed6d;*/
+}
+
+.words {
+	/*margin-left: 60px;*/
+}
+
+.reply {
+	border-left-color: #AAA; 
+	padding-top: 15px;
+	margin-top:20px;
+	margin-bottom:10px;
+	margin-left:75px;
+	padding-top:20px;
+	padding-left: 20px;
+	padding-bottom: 20px;
+	/*background-color:#fff6bc;*/
+}
+
+/* Got this from https://codepen.io/ibrahimjabbari/pen/ozinB */
+.hr-style {
+	border-top: 1px solid #8c8b8b;
 }
 
