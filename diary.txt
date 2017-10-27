@@ -17,4 +17,5 @@
 26/10/17	15:20	18:20	Coding	Setting up posts display 
 26/10/17	20:30	00:00	Coding	Sorting the posts/comments/replies by date and displaying
 27/10/17	00:00	02:00	Debugging	Trying to get it to work properly
-27/10/17	15:00	18:20	Coding	Getting the main feed up and running
+27/10/17	15:00	18:20	Debugging/Styling Styling the posts + debugging the tagging system
+27/10/17	21:00	23:00	Coding/Debugging Setting up and debugging Searching for users

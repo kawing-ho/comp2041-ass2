@@ -27,6 +27,18 @@ def checkLogin():
 def whoAmI():
 	return session["zid"]
 
+#gets the name of the person by zid
+def getName(zid):
+	
+	filename = os.path.join(students_dir,zid,"student.txt")
+	with open(filename) as f:
+		n = re.search("name: ([\w\- ]+)", f.read())
+	
+	if(n is None): name = ""
+	else: name = n.group(1)
+	
+	return name
+
 #parse birthday into a more human friendly format
 def parseBirthday(bday):
 	if(bday == "-"): return bday
@@ -37,44 +49,20 @@ def parseBirthday(bday):
 	         "8":"August","9":"September","10":"October","11":"November","12":"December"}.get(month,"NEIN")
 	
 	return (day + " " + month + " " + year)
-	
-#returns dictionary of info for friends list / posts / comments / replies
-def getInfo(zid):
-	details_filename = os.path.join(students_dir, zid, "student.txt")
-	details = {}
-	#Get text details from file
-	try:
-		with open(details_filename) as f:
-			for line in f:
-				match = re.search("([^\:]+): (.*)",line)
-				key = match.group(1)
-				value = match.group(2)
-				details[key] = value
-	except Exception as e: print(e)
-	
-	#set default values
-	for field in all_possible_details:
-		if field not in details.keys():
-			details[field] = "-"
- 	    	
- 	#get image as well
-	image = os.path.join(static_dir, zid, "img.jpg")
-	checkImage = os.path.join(students_dir, zid, "img.jpg")
-	if(os.path.exists(checkImage) is False): #use default avatar if none found
-		image = "avatar.jpg"
-			
-	details["image"] = image
-	return details
 #-------------------------------------------------
-	
-	
 	
 	
 	
 @app.route('/results', methods=['POST'])
 def results():
 	checkLogin()
-	return render_template('results.html', me=whoAmI())
+	results = []
+	search = request.form.get('search','')
+	print("Searched :","\'"+search+"\'")
+	
+	#get dictionary of all users 
+	
+	return render_template('results.html', me=whoAmI(), search=search, results=results)
 
 @app.route('/settings', methods=['GET'])
 def settings():
@@ -218,17 +206,18 @@ def profile(zid=None):
 		type = "post"
 		
 
-		if(re.match("z\d+", message)): 
-			print(message)
+		if(re.search("z\d+", message)): 
+			#print(getName(sender), message)
 			for tagged in re.findall("z\d+", message):
 				#tagged is still a zid here
+				#print(tagged,"-",getName(tagged))
 				
-				details = getInfo(tagged.lstrip().rstrip())
-				print(tagged)
-				#print(tagged,"-",details["full_name"])
+				#need to replace tagged with repl
+				url = url_for('profile',zid=tagged)
+				repl = "<a href=\""+url+"\"><mark>@"+getName(tagged)+"</mark></a>"
+				message = message.replace(tagged,repl)
 				
-				
-			print("--------")
+			#print("--------")
 		
 		#if its a comment then the parent number is left of slash
 		comment = re.compile('^\d+\-\d+\.txt$')
