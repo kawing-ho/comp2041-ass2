@@ -54,6 +54,31 @@ def parseBirthday(bday):
 	return (day + " " + month + " " + year)
 #-------------------------------------------------
 
+
+@app.route('/#', methods=['POST'])
+def post(message=None):
+	me = whoAmI()
+	
+	message = request.form.get('message')
+	time = dt.now().strftime("%Y-%m-%dT%H:%M:%S+0000")
+	
+	message = "message: " + message
+	sender = "from: " + me
+	time = "time: " + time
+	if(len(message) > 0):
+		path = os.path.join(students_dir,me)
+		recent = max([post for post in os.listdir(path) if re.search("^(\d)+.txt$",post)])
+		num = int(recent.replace('.txt','')) + 1
+		new = str(num)+".txt"
+		check = os.path.join(path,new)
+		if(os.path.exists(check) is False):
+			with open(check,'w+') as f:
+				data = message+"\n"+sender+"\n"+time+"\n"
+				f.write(data)
+		else: print("File already exists !!!!")	
+	
+	return redirect(url_for('profile',zid=me))
+
 #Function for handling the friend system, refreshes the page after finishing
 @app.route('/#', methods=['POST'])
 def friend(peer=None):
@@ -74,7 +99,7 @@ def friend(peer=None):
 	peerFriends = re.search("friends: (.*)",peerData).group(1)
 	
 	
-	if(request.form.get('request') or request.form.get('accept')):   # !!! SEND EMAIL !!!
+	if(request.form.get('request') or request.form.get('accept')):
 		action="request"
 		
 		#TODO if(request.form.get('request')): SEND EMAIL TODO

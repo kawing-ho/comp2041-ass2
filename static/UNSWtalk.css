@@ -39,6 +39,10 @@
 	border-width: 1px;
 }
 
+.login {
+	background-color: #000;  /*#ffe725*/
+}
+
 .name {
 	margin: 0px;
 	padding: 5px;
@@ -55,6 +59,9 @@
 	border-width: 1px;
 }
 
+.btn-block > a,
+.btn-block > a:hover,
+.btn-block > a:focus,
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus{
@@ -62,6 +69,20 @@
 	background-color: black;  
 } 
 
+.nav-pills > li.active > a,
+.nav-pills > li.active > a:hover,
+.nav-pills > li.active > a:focus{
+	color: white;
+	background-color: black;
+}
+
+.makepost > li >  a,
+.makepost > li > a:hover,
+.makepost > li > a:focus,
+.makepost {
+	color: white;
+	background-color: black;
+}
 
 .li-tabs > li > a:hover,
 .nav>li>a:focus,
@@ -102,6 +123,7 @@
 a, a:hover {
 	color: inherit;
 } 
+
 
 .search:hover {
 	color: white;
@@ -185,10 +207,6 @@ a, a:hover {
 	/*background-color:#ffed6d;*/
 }
 
-.words {
-	/*margin-left: 60px;*/
-}
-
 .reply {
 	border-left-color: #AAA; 
 	padding-top: 15px;
@@ -205,6 +223,16 @@ a, a:hover {
 .hr-style {
 	border-top: 1px solid #8c8b8b;
 }
+/* Got this from https://stackoverflow.com/a/32881197 */
+.loginbox {
+  min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+  min-height: 100vh; /* These two lines are counted as one :-)       */
+
+  display: flex;
+  align-items: center;
+  color: black;
+  background-color: #ffe725;
+}
 
 /* for the results page */
 .well {
@@ -216,5 +244,23 @@ a, a:hover {
 	background-color: black;
 }
 
+.testdiv {
+  display: table;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -50%);
+}
+
+.rounded {
+  border-radius: 10px;
+  background: #000; // without a background or border applied you won't be able to see if its rounded
+}
 
 
