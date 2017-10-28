@@ -61,7 +61,11 @@ def post(message=None):
 	
 	message = request.form.get('message')
 	time = dt.now().strftime("%Y-%m-%dT%H:%M:%S+0000")
-	
+	print("Message:",message)
+	print("-----------------")
+	message = message.replace('\r','')
+	message = message.replace('\n','\\n')
+	print("After:",message)
 	message = "message: " + message
 	sender = "from: " + me
 	time = "time: " + time
