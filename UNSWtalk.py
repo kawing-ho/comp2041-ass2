@@ -57,23 +57,37 @@ def friend(peer=None):
 	me = whoAmI()
 	peer = request.form.get('peer')
 	
+	myFile = os.path.join(students_dir,me,"student.txt")
+	try:
+			with open(filename) as f:	myData = f.read()
+	except Exception as e: print(e)
+	myFriends = re.search("friends: (.*)",myData).group(1)
+	
+	
+	peerFile = os.path.join(students_dir,peer,"student.txt")
+	try:
+			with open(filename) as f:	peerData = f.read()
+	except Exception as e: print(e)
+	peerFriends = re.search("friends: (.*)",peerData).group(1)
+	
+	
 	if(request.form.get('request')):   # !!! SEND EMAIL !!!
 		action="request"
 		
 		#add them to your friends list 
 		#(then they either add you to their list or remove themselves from your list)
-		filename = os.path.join(students_dir,me,"student.txt")
-		try:
-			with open(filename) as f:	data = f.read()
-		except Exception as e: print(e)
+		if(peer not in myFriends):
+			newFriends = friends.replace(')',", "+peer+")")
 		
-		friends = re.search("friends: (.*)",data).group(1)
-		newFriends = friends.replace(')',", "+me+")")
+			print(myData)
+			print("AFTER")
+			data = data.replace(friends, newFriends)
+			print(myData)
 		
-		data = data.replace(friends, newFriends)
-		try:
-			with open(filename,'w') as f:	f.write(data)
-		except Exception as e: print(e)
+			try:
+				with open(filename,'w') as f:	f.write(data)
+			except Exception as e: print(e)
+		else: print("They're already in the list !")
 		
 		
 	elif(request.form.get('cancel')):
@@ -81,6 +95,7 @@ def friend(peer=None):
 		
 		#delete them from your friends list
 		#(basically undo the action of sending the request)
+		
 		
 	elif(request.form.get('accept')):
 		action="accept"
