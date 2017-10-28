@@ -50,9 +50,63 @@ def parseBirthday(bday):
 	
 	return (day + " " + month + " " + year)
 #-------------------------------------------------
+
+#Function for handling the friend system, refreshes the page after finishing
+@app.route('/#', methods=['POST'])
+def friend(peer=None):
+	me = whoAmI()
+	peer = request.form.get('peer')
+	
+	if(request.form.get('request')):   # !!! SEND EMAIL !!!
+		action="request"
+		
+		#add them to your friends list 
+		#(then they either add you to their list or remove themselves from your list)
+		filename = os.path.join(students_dir,me,"student.txt")
+		try:
+			with open(filename) as f:	data = f.read()
+		except Exception as e: print(e)
+		
+		friends = re.search("friends: (.*)",data).group(1)
+		newFriends = friends.replace(')',", "+me+")")
+		
+		data = data.replace(friends, newFriends)
+		try:
+			with open(filename,'w') as f:	f.write(data)
+		except Exception as e: print(e)
+		
+		
+	elif(request.form.get('cancel')):
+		action="cancel"
+		
+		#delete them from your friends list
+		#(basically undo the action of sending the request)
+		
+	elif(request.form.get('accept')):
+		action="accept"
+		
+		#add them to your friends list 
+		#(since they added you to theirs already)
+		
+	elif(request.form.get('reject')):
+		action="reject"
+		
+		#delete yourself from their friend list
+		#(then they will have to add you to the list again as a "request")
+		
+	elif(request.form.get('unfriend')):
+		action="unfriend"
+		
+		#delete them from your friends list
+		#delete yourself from their friends list
+		
+		
+	else: action="UNDEFINED"
 	
 	
-	
+	print("Friend button pressed:", peer, action)
+	return redirect(url_for('profile',zid=peer))
+
 @app.route('/results', methods=['POST'])
 def results():
 	checkLogin()
@@ -300,9 +354,25 @@ def my_utility_processor():
 		t = dt.strptime(time, "%Y-%m-%dT%H:%M:%S+0000")
 		time = t.strftime('%I:%M %p / %d %b %Y').lstrip('0')
 		return time
+		
+	#check the friendship status of two individuals
+	#results:[none, request, requested, friends]
+	def checkFriendship(me, peer):
+		me_details = getInfo(me)
+		peer_details = getInfo(peer)
+		
+		myFriends = me_details['friends']
+		peerFriends = peer_details['friends']
+		
+		if(peer not in myFriends and me not in peerFriends): result = "none"
+		elif(peer not in myFriends and me in peerFriends): result = "requested"
+		elif(peer in myFriends and me not in peerFriends): result = "request"
+		elif(peer in myFriends and me in peerFriends): result = "friends"
+		
+		return result
 	
 	
-	return dict(getInfo=getInfo, whoAmI=whoAmI, fixTime=fixTime)
+	return dict(getInfo=getInfo, whoAmI=whoAmI, fixTime=fixTime, friendship=checkFriendship)
 	
 
 
