@@ -21,10 +21,13 @@ app = Flask(__name__)
 
 #if session is not found redirect to login 
 def checkLogin():
-	if 'zid' not in session: return render_template('login.html')
+	if(len(session) == 0): return redirect(url_for('login'))
+	if 'zid' not in session: return redirect(url_for('login'))
 
 #get the zid of the logged in user
 def whoAmI():
+	checkLogin()
+	if 'zid' not in session: return render_template('login.html')
 	return session["zid"]
 
 #gets the name of the person by zid
@@ -59,33 +62,31 @@ def friend(peer=None):
 	
 	myFile = os.path.join(students_dir,me,"student.txt")
 	try:
-			with open(filename) as f:	myData = f.read()
+			with open(myFile) as f:	myData = f.read()
 	except Exception as e: print(e)
 	myFriends = re.search("friends: (.*)",myData).group(1)
 	
 	
 	peerFile = os.path.join(students_dir,peer,"student.txt")
 	try:
-			with open(filename) as f:	peerData = f.read()
+			with open(peerFile) as f:	peerData = f.read()
 	except Exception as e: print(e)
 	peerFriends = re.search("friends: (.*)",peerData).group(1)
 	
 	
-	if(request.form.get('request')):   # !!! SEND EMAIL !!!
+	if(request.form.get('request') or request.form.get('accept')):   # !!! SEND EMAIL !!!
 		action="request"
+		
+		#TODO if(request.form.get('request')): SEND EMAIL TODO
 		
 		#add them to your friends list 
 		#(then they either add you to their list or remove themselves from your list)
 		if(peer not in myFriends):
-			newFriends = friends.replace(')',", "+peer+")")
-		
-			print(myData)
-			print("AFTER")
-			data = data.replace(friends, newFriends)
-			print(myData)
+			newFriends = myFriends.replace(')',", "+peer+")")	
+			data = myData.replace(myFriends, newFriends)
 		
 			try:
-				with open(filename,'w') as f:	f.write(data)
+				with open(myFile,'w') as f:	f.write(data)
 			except Exception as e: print(e)
 		else: print("They're already in the list !")
 		
@@ -95,11 +96,17 @@ def friend(peer=None):
 		
 		#delete them from your friends list
 		#(basically undo the action of sending the request)
+		if(peer in myFriends):
+			newFriends = myFriends.replace("("+peer+",",'(')
+			newFriends = myFriends.replace(", "+peer,'')
+			data = myData.replace(myFriends, newFriends)
+			print("deleted",peer)
+			try:
+				with open(myFile,'w') as f: f.write(data)
+			except Exception as e: print(e)
+		else: print("They're not in the list ?")
 		
-		
-	elif(request.form.get('accept')):
-		action="accept"
-		
+		#acceptance is handled above as well
 		#add them to your friends list 
 		#(since they added you to theirs already)
 		
@@ -108,13 +115,59 @@ def friend(peer=None):
 		
 		#delete yourself from their friend list
 		#(then they will have to add you to the list again as a "request")
+		if(me in peerFriends):
+			newFriends = peerFriends.replace("("+me+",",'(')
+			newFriends = peerFriends.replace(", "+me,'')
+			data = peerData.replace(peerFriends, newFriends)
+		try:
+			with open(peerFile,'w') as f: f.write(data)
+		except Exception as e: print(e)
+		else: print("I'm not in their friend list ?")
 		
 	elif(request.form.get('unfriend')):
 		action="unfriend"
 		
 		#delete them from your friends list
-		#delete yourself from their friends list
+		if(peer in myFriends):
+
+			newFriends = myFriends
+			if(re.match(", "+peer,myFriends)): 
+				print("matched the mid")
+				newFriends = myFriends.replace(", "+peer,'')
+			else: 
+				print("matched the end")
+				newFriends = myFriends.replace(peer+", ",'')
+
+			data = myData.replace(myFriends, newFriends)
+			print("deleting",peer)
+			print(myFriends)
+			print(newFriends)
+
+			try:
+				with open(myFile,'w') as f: f.write(data)
+			except Exception as e: print(e)
+		else: print("They're not in the list ?")
 		
+		#delete yourself from their friends list
+		if(me in peerFriends):
+
+			newFriends = peerFriends
+			if(re.match(", "+me,peerFriends)): 
+				print("matched the mid")
+				newFriends = peerFriends.replace(", "+me,'')
+			else: 
+				print("matched the end")
+				newFriends = peerFriends.replace(me+", ",'')
+
+			data = peerData.replace(peerFriends, newFriends)
+			print("deleting",me)
+			print(peerFriends)
+			print(newFriends)
+
+			try:
+				with open(peerFile,'w') as f: f.write(data)
+			except Exception as e: print(e)
+		else: print("I'm not in their friend list ?")
 		
 	else: action="UNDEFINED"
 	
@@ -360,6 +413,7 @@ def my_utility_processor():
 	#-------------------------------------------------
 	
 	def whoAmI():
+		checkLogin()
 		return session["zid"]
 
 	#returns a more user-friendly version of time string
@@ -393,4 +447,4 @@ def my_utility_processor():
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
-    app.run(debug=True, port=7331)
+    app.run(debug=True, port=65535)
