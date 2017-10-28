@@ -103,6 +103,11 @@ a, a:hover {
 	color: inherit;
 } 
 
+.search:hover {
+	color: white;
+	background-color: black;
+}
+
 /*Got this from https://stackoverflow.com/a/35063374*/
 .img-circle {
 	object-fit: cover;
@@ -200,4 +205,16 @@ a, a:hover {
 .hr-style {
 	border-top: 1px solid #8c8b8b;
 }
+
+/* for the results page */
+.well {
+	/*margin: 5px;*/
+	padding: 5px;
+	padding-top: 0px;
+	padding-left: 15px;
+	color: white;
+	background-color: black;
+}
+
+
 

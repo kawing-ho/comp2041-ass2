@@ -19,3 +19,5 @@
 27/10/17	00:00	02:00	Debugging	Trying to get it to work properly
 27/10/17	15:00	18:20	Debugging/Styling Styling the posts + debugging the tagging system
 27/10/17	21:00	23:00	Coding/Debugging Setting up and debugging Searching for users
+28/10/17	13:30	14:30	Coding	Continuing work on search function
+28/10/17	14:30	15:30	Coding Work on the friending system

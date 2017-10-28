@@ -57,10 +57,17 @@ def parseBirthday(bday):
 def results():
 	checkLogin()
 	results = []
+	students = {}
 	search = request.form.get('search','')
 	print("Searched :","\'"+search+"\'")
+	search = search.lower()
 	
-	#get dictionary of all users 
+	#get dictionary of all users -- student['name'] = zid
+	for user in os.listdir(students_dir):
+		students[getName(user).lower()] = user
+	
+	for key,value in students.items():
+		if(re.search(search, key)): results.append(value)
 	
 	return render_template('results.html', me=whoAmI(), search=search, results=results)
 
