@@ -30,6 +30,17 @@ def whoAmI():
 	if 'zid' not in session: return render_template('login.html')
 	return session["zid"]
 
+#replace all tags with name and links
+def addTags(message):
+	if(re.search("z\d+", message)): 
+			
+		for tagged in re.findall("z\d+", message):
+			url = url_for('profile',zid=tagged)
+			repl = "<a href=\""+url+"\"><mark>@"+getName(tagged)+"</mark></a>"
+			message = message.replace(tagged,repl)
+			
+	return message
+
 #gets the name of the person by zid
 def getName(zid):
 	
@@ -61,11 +72,9 @@ def post(message=None):
 	
 	message = request.form.get('message')
 	time = dt.now().strftime("%Y-%m-%dT%H:%M:%S+0000")
-	print("Message:",message)
-	print("-----------------")
 	message = message.replace('\r','')
 	message = message.replace('\n','\\n')
-	print("After:",message)
+	
 	message = "message: " + message
 	sender = "from: " + me
 	time = "time: " + time
@@ -232,7 +241,220 @@ def settings():
 def feed():
 	
 	checkLogin()
-	return render_template('feed.html', me=whoAmI())
+	me = whoAmI()
+	
+	postList = []
+	commentList = []
+	replyList = []
+	
+	#Section for recent posts
+	recentPostList = []
+	recentCommentList = []
+	recentReplyList = []
+	
+	#only grab posts that are recent enough
+	content_path = os.path.join(students_dir, me)
+	myPosts = [ content for content in os.listdir(content_path) if re.search("^\d+.txt$",content) ]
+	
+	for post in myPosts:
+		filename = os.path.join(content_path, post)
+		try:
+			with open(filename) as f: data = f.read()
+		except Exception as e: print("checking posts file",e)
+		
+		self = re.sub('\D','',post)
+		
+		time = re.search("time: (.*)",data).group(1)
+		t = dt.strptime(time, "%Y-%m-%dT%H:%M:%S+0000")
+		lastMonth = "01/10/2017"
+		t2 = dt.strptime(lastMonth, "%d/%m/%Y")
+		
+		if(t > t2): 
+			parent = None
+			sender = re.search("from: (.*)",data).group(1)
+			m = re.search("message: (.*)",data)
+			message = "" if m is None else m.group(1)
+			message = message.replace("\\n","<br \>")
+			message = addTags(message)
+					
+			recentPostList.append((time, parent, self, sender, message))
+	
+	#only grab comments that are from recent posts
+	myComments = [ content for content in os.listdir(content_path) if re.search("^\d+-\d+\.txt",content) ]
+	parents = [tup[2] for tup in recentPostList]
+	
+	if(parents):
+		for comment in myComments:
+			p = re.search('^(\d+)-(\d+)\.txt$',comment)
+			parent = p.group(1)
+			self = p.group(2)
+			if(parent not in parents): continue
+			
+			filename = os.path.join(content_path, comment)
+			try:
+				with open(filename) as f: data = f.read()
+			except Exception as e: print("checking comments file",e)
+			
+			sender = re.search("from: (.*)",data).group(1)
+			time = re.search("time: (.*)",data).group(1)
+			m = re.search("message: (.*)",data)
+			message = "" if m is None else m.group(1)
+			message = message.replace("\\n","<br \>")
+			message = addTags(message)
+			
+			recentCommentList.append((time, parent,self, sender, message))
+	
+	#only grab replies that are from comments that are from recent posts
+	myReplies = [ content for content in os.listdir(content_path) if re.search("^\d+-\d+-\d+\.txt$", content) ]
+	parents = [tup[2] for tup in recentCommentList]
+	
+	if(parents):
+		for reply in myReplies:
+			r = re.search('^\d+-(\d+)-(\d+)\.txt$'.reply)
+			parent = r.group(1)
+			self = r.group(2)
+			if(parent not in parents): continue
+			
+			filename = os.path.join(content_path, reply)
+			try:
+				with open(filename) as f: data = f.read()
+			except Exception as e: print("checking comments file",e)
+			
+			sender = re.search("from: (.*)",data).group(1)
+			time = re.search("time: (.*)",data).group(1)
+			m = re.search("message: (.*)",data)
+			message = "" if m is None else m.group(1)
+			message = message.replace("\\n","<br \>")
+			message = addTags(message)
+			
+			recentReplyList.append((time, parent,self, sender, message))
+			
+	recentPostList.sort(reverse=True)
+	recentCommentList.sort(reverse=True)
+	recentReplyList.sort(reverse=True)
+	
+		
+	#Section for friend's posts
+	friendsPostList = []
+	friendsCommentList = []
+	friendsReplyList = []
+	
+	#get list of friends
+	filename = os.path.join(students_dir,me,"student.txt")
+	try:
+		with open(filename) as f: data = f.read()
+	except Exception as e: print("Getting friends list", e)
+	friendStr = re.search("friends: (.*)",data).group(1)
+	friendStr = friendStr.replace("(",'').replace(")",'').replace(",",'')
+	friends = friendStr.split(" ")
+	
+	#for every single friend 
+	for friend in friends:
+		content_path = os.path.join(students_dir, friend)
+		friendPosts = [ content for content in os.listdir(content_path) if re.search("^\d+.txt$",content) ]
+	
+		for post in friendPosts:
+			filename = os.path.join(content_path, post)
+			try:
+				with open(filename) as f: data = f.read()
+			except Exception as e: print("checking posts file",e)
+		
+		
+			self = re.sub('\D','',post)
+			self = self + "//" + friend  #unique identifier for post per friend
+			time = re.search("time: (.*)",data).group(1)
+			parent = None
+			sender = re.search("from: (.*)",data).group(1)
+			m = re.search("message: (.*)",data)
+			message = "" if m is None else m.group(1)
+			message = message.replace("\\n","<br \>")
+			message = addTags(message)
+			
+			friendsPostList.append((time, parent, self, sender, message))
+	
+		#only grab comments that are from parents
+		friendComments = [ content for content in os.listdir(content_path) if re.search("^\d+-\d+\.txt",content) ]
+		parents = [tup[2] for tup in friendsPostList]
+	
+		if(parents):
+			for comment in friendComments:
+				p = re.search('^(\d+)-(\d+)\.txt$',comment)
+				parent = p.group(1) + "//" + friend
+				self = p.group(2) + "//" + friend
+				if(parent not in parents): continue
+			
+				filename = os.path.join(content_path, comment)
+				try:
+					with open(filename) as f: data = f.read()
+				except Exception as e: print("checking comments file",e)
+			
+				sender = re.search("from: (.*)",data).group(1)
+				time = re.search("time: (.*)",data).group(1)
+				m = re.search("message: (.*)",data)
+				message = "" if m is None else m.group(1)
+				message = message.replace("\\n","<br \>")
+				message = addTags(message)
+			
+				friendsCommentList.append((time, parent, self, sender, message))
+	
+		#only grab replies that are from comments that are from friends posts
+		friendReplies = [ content for content in os.listdir(content_path) if re.search("^\d+-\d+-\d+\.txt$", content) ]
+		parents = [tup[2] for tup in friendsCommentList]
+	
+		if(parents):
+			for reply in friendReplies:
+				r = re.search('^(\d)+-(\d+)-(\d+)\.txt$',reply)
+				root = r.group(1) + "//" + friend
+				parent = r.group(2) + "//" + friend
+				self = r.group(3) + "//" + friend
+				if(parent not in parents): continue
+				
+				filename = os.path.join(content_path, reply)
+				try:
+					with open(filename) as f: data = f.read()
+				except Exception as e: print("checking comments file",e)
+				
+				sender = re.search("from: (.*)",data).group(1)
+				time = re.search("time: (.*)",data).group(1)
+				m = re.search("message: (.*)",data)
+				message = "" if m is None else m.group(1)
+				message = message.replace("\\n","<br \>")
+				message = addTags(message)
+			
+				friendsReplyList.append((time, parent, self, sender, message, root))
+	#end of friend loop
+	
+	friendsPostList.sort(reverse=True)
+	friendsCommentList.sort(reverse=True)
+	friendsReplyList.sort(reverse=True)
+	print(friendsReplyList)
+	
+	
+	#Section for mentions
+	return render_template('feed.html', 
+						   recent=recentPostList, 
+                           recentComment=recentCommentList,
+                           recentReply=recentReplyList,
+                           friends=friendsPostList,
+                           friendsComment=friendsCommentList,
+                           friendsReply=friendsReplyList,
+                           )
+	
+	'''
+	return render_template('feed.html',
+                           recent=recentPostList, 
+                           recentComment=recentCommentList,
+                           recentReply=recentReplyList,
+                           
+                           friends=friendsPostList,
+                           friendsComment=friendsCommentList,
+                           friendsReply=friendsReplyList,
+                           
+                           mention=mentionPostList,
+                           mentionComment=mentionCommentList,
+                           mentionReply=mentionReplyList
+                           )
+    '''
 
 #function which logs out the user
 @app.route('/logout',methods=['GET','POST'])
