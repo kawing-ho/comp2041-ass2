@@ -24,4 +24,9 @@
 28/10/17	20:00	22:50	Debugging	Fixing messy workaround for working with the friends field in files
 28/10/17	22:50	00:00	Coding	Setting up main feed for user
 29/10/17	00:00	02:00	Coding/Debugging	Styling and shit (Completed Make Post)
-29/10/17	10:00	12:00	Coding	
+29/10/17	10:00	12:00	Coding	Initial code for main feed
+29/10/17	13:00	18:00	Debugging/Styling	Main feed debugging and styling
+29/10/17	19:30	22:00	Coding	Finishing up on main feed 
+29/10/17	22:00	23:00	Debugging	Fixed an issue where post function and friend function both reacted to the same POST request
+29/10/17	23:00	23:59	Debugging	Weird bug where ALL comments and replies were added to every post on feed
+30/10/17	00:00	01:00	Coding	News feed completed, moving on to Post Search

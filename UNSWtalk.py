@@ -10,6 +10,7 @@
 import os, re
 from flask import Flask, render_template, session, url_for, redirect, request
 from datetime import datetime as dt
+from glob import glob as g
 
 students_dir = "static/dataset-medium"
 static_dir = students_dir.replace("static/",'')
@@ -21,8 +22,8 @@ app = Flask(__name__)
 
 #if session is not found redirect to login 
 def checkLogin():
-	if(len(session) == 0): return redirect(url_for('login'))
-	if 'zid' not in session: return redirect(url_for('login'))
+	if(len(session) == 0): return render_template('login.html')
+	if 'zid' not in session: return render_template('login.html')
 
 #get the zid of the logged in user
 def whoAmI():
@@ -66,11 +67,13 @@ def parseBirthday(bday):
 #-------------------------------------------------
 
 
-@app.route('/#', methods=['POST'])
-def post(message=None):
+#@app.route('/#', methods=['POST']) # '/#'
+@app.route('/user/<zid>', methods=['POST'])
+def post(message=None, zid=None):
 	me = whoAmI()
 	
 	message = request.form.get('message')
+	
 	time = dt.now().strftime("%Y-%m-%dT%H:%M:%S+0000")
 	message = message.replace('\r','')
 	message = message.replace('\n','\\n')
@@ -95,6 +98,7 @@ def post(message=None):
 #Function for handling the friend system, refreshes the page after finishing
 @app.route('/#', methods=['POST'])
 def friend(peer=None):
+
 	me = whoAmI()
 	peer = request.form.get('peer')
 	
@@ -170,16 +174,11 @@ def friend(peer=None):
 
 			newFriends = myFriends
 			if(re.match(", "+peer,myFriends)): 
-				print("matched the mid")
 				newFriends = myFriends.replace(", "+peer,'')
 			else: 
-				print("matched the end")
 				newFriends = myFriends.replace(peer+", ",'')
 
 			data = myData.replace(myFriends, newFriends)
-			print("deleting",peer)
-			print(myFriends)
-			print(newFriends)
 
 			try:
 				with open(myFile,'w') as f: f.write(data)
@@ -198,9 +197,6 @@ def friend(peer=None):
 				newFriends = peerFriends.replace(me+", ",'')
 
 			data = peerData.replace(peerFriends, newFriends)
-			print("deleting",me)
-			print(peerFriends)
-			print(newFriends)
 
 			try:
 				with open(peerFile,'w') as f: f.write(data)
@@ -427,10 +423,96 @@ def feed():
 	friendsPostList.sort(reverse=True)
 	friendsCommentList.sort(reverse=True)
 	friendsReplyList.sort(reverse=True)
-	print(friendsReplyList)
-	
 	
 	#Section for mentions
+	
+	mentionPostList= []
+	mentionCommentList = []
+	mentionReplyList = []
+	
+	#get a list of all files which have you tagged in it
+	others = [ student for student in os.listdir(students_dir) if student != me ]
+	mention = []
+	
+	for student in others:
+		paths = os.path.join(students_dir,student)
+		for file in os.listdir(paths):
+			if(file == "student.txt" or file == "img.jpg"): continue
+			
+			#check to see if file mentions you
+			filepath = os.path.join(paths,file)
+			try:
+				with open(filepath) as f:
+					data = f.read()
+					m = re.search("message: (.*)",data)
+					message = "" if m is None else m.group(1)
+					if(message.find(me) > -1):
+						mention.append(filepath)
+			except Exception as e: print("Accessing file",e)
+	
+	
+	#populate set with all files/ (posts/comments/replies) relating to ME 
+	# as long as ME is mentioned in it everything must be shown
+	
+	toGlob = set()
+	
+	for mentionPath in mention:
+		mentionPath = re.sub("-\d*?-?\d*?\.txt$",'*',mentionPath)
+		toGlob.add(mentionPath)
+	
+	mention = []
+	for item in toGlob:
+		for file in g(item):
+			mention.append(file)
+			
+	#for each file, separate them into lists and store as tuple of info
+	for path in mention:
+		try:
+			with open(path) as f:
+				data = f.read()
+		except Exception as e:
+			print("Content file",e)
+		
+		content = re.sub(".*?\/",'',path)
+		person = re.search("(z\d+)",path).group(1)
+		print(path, content, person)
+		sender = re.search("from: (\w+)",data).group(1)			#get zid
+		time = re.search("time: ([\w:\+\-]+)",data).group(1)	#get Date
+		m = re.search("message: (.*)",data)
+		message = "" if(m is None) else m.group(1)				#get message
+		message = message.replace("\\n","<br \>")
+		message = addTags(message)
+		parent = None
+		root = None
+		self = re.search("-?(\d+)\.txt$",content).group(1) + "//" + person
+		type = "post"
+		
+		#if its a comment then the parent number is left of slash
+		comment = re.compile('^\d+\-\d+\.txt$')
+		if comment.match(content):
+			type = "comment"
+			parent = re.search("^(\d+)\-\d+\.txt$",content).group(1)
+			parent = parent + "//" + person
+				
+		#if its a reply then the parent number is between two slashes
+		reply = re.compile('^\d+\-\d+\-\d+.txt$')
+		if reply.match(content):
+			type = "reply"
+			m = re.search("(^\d+)\-(\d+)\-\d+.txt$",content)
+			root = m.group(1) + "//" + person
+			parent = m.group(2) + "//" + person
+				
+		element = (time, parent, self, sender, message, root)
+				
+		if(type == "post"): mentionPostList.append(element)
+		elif(type == "comment"): mentionCommentList.append(element)
+		elif(type == "reply"): mentionReplyList.append(element)
+		else: print("ERROR IN CONTENT")
+
+	mentionPostList.sort(reverse=True)
+	mentionCommentList.sort(reverse=True)
+	mentionReplyList.sort(reverse=True)
+	
 	return render_template('feed.html', 
 						   recent=recentPostList, 
                            recentComment=recentCommentList,
@@ -438,23 +520,9 @@ def feed():
                            friends=friendsPostList,
                            friendsComment=friendsCommentList,
                            friendsReply=friendsReplyList,
-                           )
-	
-	'''
-	return render_template('feed.html',
-                           recent=recentPostList, 
-                           recentComment=recentCommentList,
-                           recentReply=recentReplyList,
-                           
-                           friends=friendsPostList,
-                           friendsComment=friendsCommentList,
-                           friendsReply=friendsReplyList,
-                           
                            mention=mentionPostList,
                            mentionComment=mentionCommentList,
-                           mentionReply=mentionReplyList
-                           )
-    '''
+                           mentionReply=mentionReplyList)
 
 #function which logs out the user
 @app.route('/logout',methods=['GET','POST'])
@@ -476,7 +544,7 @@ def login():
 	
 	#--- AUTO-LOGIN for easy debugging ---#
 	session['zid'] = "z5196487"
-	return redirect(url_for('feed'))
+	return redirect(url_for('profile',zid="z5196487"))
 	#-------------------------------------#
 	
 	#sanitize input
