@@ -42,11 +42,15 @@
             <li>
               <form class="navbar-form" method="POST" action="{{ url_for('results') }}">
                 <div class="form-group">
-            	  <input type="text" class="search_box" name ="search" maxlength="40" placeholder="Search for a user ...">
+            	  <input type="text" class="search_box" name ="search" maxlength="40" placeholder="Search for a user or post ...">
                 </div>
-            	  <button class="btn btn-sm search">
+            	<button class="btn btn-sm search" type="submit" name="users" value="1">
             	  <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-            	  <strong> Search</strong>
+            	  <strong> Users</strong>
+            	</button>
+            	<button class="btn btn-sm search" type="submit" name="posts" value="1">
+            	  <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+            	  <strong> Posts</strong>
             	</button>
               </form>
             </li>
@@ -56,7 +60,6 @@
           
           	<li>
               <a href="{{ url_for('profile', zid=me) }}">
-                	{% set me = whoAmI() %}
                 	{% set my_details = getInfo(me) %}
                 	{% set myImage = my_details['image'] %}
                 	<badge><img src= "{{ url_for('static', filename = myImage) }}" class="img-circle base" alt="profile pic" height="20" width="20"></badge>

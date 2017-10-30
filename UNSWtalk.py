@@ -210,22 +210,132 @@ def friend(peer=None):
 	return redirect(url_for('profile',zid=peer))
 
 @app.route('/results', methods=['POST'])
-def results():
+def results(action=None,search=None):
 	checkLogin()
 	results = []
 	students = {}
+	
 	search = request.form.get('search','')
 	print("Searched :","\'"+search+"\'")
 	search = search.lower()
 	
-	#get dictionary of all users -- student['name'] = zid
-	for user in os.listdir(students_dir):
-		students[getName(user).lower()] = user
+	if(request.form.get('users')):
+		print("users")
+
+		#get dictionary of all users -- student['name'] = zid
+		for user in os.listdir(students_dir):
+			students[getName(user).lower()] = user
 	
-	for key,value in students.items():
-		if(re.search(search, key)): results.append(value)
+		for key,value in students.items():
+			if(re.search(search, key)): results.append(value)
 	
-	return render_template('results.html', me=whoAmI(), search=search, results=results)
+		return render_template('results.html', search=search, results=results, action="user")
+	
+	
+	if(request.form.get('posts')):
+		print("posts")
+		
+		postList = []
+		commentList = []
+		replyList = []
+		found = []
+		
+		#return nothing for empty searches
+		if(search == ''):
+			return render_template('results.html', action="post", 
+                                search=search, 
+                                postList=postList,
+								commentList=commentList,
+  								replyList=replyList)
+		
+		#return list(s) of posts + children with the search words
+		
+		#get all students
+		for student in os.listdir(students_dir):
+			paths = os.path.join(students_dir,student)
+			for file in os.listdir(paths):
+				if(file == "student.txt" or file == "img.jpg"): continue
+				if(re.search("^\d+\.txt",file) is None): continue
+			
+				#check to see if message matches search query
+				filepath = os.path.join(paths,file)
+				try:
+					with open(filepath) as f:
+						data = f.read()
+						m = re.search("message: (.*)",data)
+						message = "" if m is None else m.group(1)
+						message = message.lower()
+						if(message.find(search) > -1):
+							found.append(filepath)
+				except Exception as e: print("Accessing file",e)
+				
+		#populate set with all files/ (posts/comments/replies) relating to found
+		toGlob = set()
+	
+		for foundPath in found:
+			foundPath = re.sub("\.txt$",'*',foundPath)
+			toGlob.add(foundPath)
+	
+		found = []
+		for item in toGlob:
+			for file in g(item):
+				found.append(file)
+			
+		#for each file, separate them into lists and store as tuple of info
+		for path in found:
+			try:
+				with open(path) as f:
+					data = f.read()
+			except Exception as e:
+				print("Content file",e)
+		
+			content = re.sub(".*?\/",'',path)
+			person = re.search("(z\d+)",path).group(1)
+			print(path, content, person)
+			sender = re.search("from: (\w+)",data).group(1)			#get zid
+			time = re.search("time: ([\w:\+\-]+)",data).group(1)	#get Date
+			m = re.search("message: (.*)",data)
+			message = "" if(m is None) else m.group(1)				#get message
+			message = message.replace("\\n","<br \>")
+			message = addTags(message)
+			parent = None
+			root = None
+			self = re.search("-?(\d+)\.txt$",content).group(1) + "//" + person
+			type = "post"
+		
+			#if its a comment then the parent number is left of slash
+			comment = re.compile('^\d+\-\d+\.txt$')
+			if comment.match(content):
+				type = "comment"
+				parent = re.search("^(\d+)\-\d+\.txt$",content).group(1)
+				parent = parent + "//" + person
+				
+			#if its a reply then the parent number is between two slashes
+			reply = re.compile('^\d+\-\d+\-\d+.txt$')
+			if reply.match(content):
+				type = "reply"
+				m = re.search("(^\d+)\-(\d+)\-\d+.txt$",content)
+				root = m.group(1) + "//" + person
+				parent = m.group(2) + "//" + person
+				
+			element = (time, parent, self, sender, message, root)
+				
+			if(type == "post"): postList.append(element)
+			elif(type == "comment"): commentList.append(element)
+			elif(type == "reply"): replyList.append(element)
+			else: print("ERROR IN CONTENT")
+		
+		postList.sort(reverse=True)
+		commentList.sort(reverse=False)
+		replyList.sort(reverse=False)
+		
+		return render_template('results.html', action="post", 
+                                search=search, 
+                                postList=postList,
+								commentList=commentList,
+  								replyList=replyList)
+	
+
 
 @app.route('/settings', methods=['GET'])
 def settings():
@@ -326,8 +436,8 @@ def feed():
 			recentReplyList.append((time, parent,self, sender, message))
 			
 	recentPostList.sort(reverse=True)
-	recentCommentList.sort(reverse=True)
-	recentReplyList.sort(reverse=True)
+	recentCommentList.sort(reverse=False)
+	recentReplyList.sort(reverse=False)
 	
 		
 	#Section for friend's posts
@@ -421,8 +531,8 @@ def feed():
 	#end of friend loop
 	
 	friendsPostList.sort(reverse=True)
-	friendsCommentList.sort(reverse=True)
-	friendsReplyList.sort(reverse=True)
+	friendsCommentList.sort(reverse=False)
+	friendsReplyList.sort(reverse=False)
 	
 	#Section for mentions
 	
@@ -430,6 +540,7 @@ def feed():
 	mentionCommentList = []
 	mentionReplyList = []
 	
+	'''
 	#get a list of all files which have you tagged in it
 	others = [ student for student in os.listdir(students_dir) if student != me ]
 	mention = []
@@ -512,6 +623,11 @@ def feed():
 	mentionPostList.sort(reverse=True)
 	mentionCommentList.sort(reverse=True)
 	mentionReplyList.sort(reverse=True)
+	'''
+	
+	num = (len(friendsPostList)//10) + 1
+	jsList = ["\"group"+str(i)+"\"" for i in range(num)]
+	print(jsList)
 	
 	return render_template('feed.html', 
 						   recent=recentPostList, 
@@ -522,7 +638,8 @@ def feed():
                            friendsReply=friendsReplyList,
                            mention=mentionPostList,
                            mentionComment=mentionCommentList,
-                           mentionReply=mentionReplyList)
+                           mentionReply=mentionReplyList,
+						   jsList=jsList)
 
 #function which logs out the user
 @app.route('/logout',methods=['GET','POST'])
@@ -688,10 +805,10 @@ def profile(zid=None):
 		elif(type == "reply"): replyList.append(element)
 		else: print("ERROR IN CONTENT")
 	
-	#sort chronologically means most recent first
+	#sort chronologically means most recent first (for posts only)
 	postList.sort(reverse=True)
-	commentList.sort(reverse=True)
-	replyList.sort(reverse=True)
+	commentList.sort(reverse=False)
+	replyList.sort(reverse=False)
 		
 	return render_template('profile.html', zid=zid, student_details=details, image=image,
                                            postList=postList, commentList=commentList,
