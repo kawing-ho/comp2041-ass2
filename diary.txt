@@ -32,4 +32,4 @@
 30/10/17	00:00	01:00	Coding	News feed completed, moving on to Post Search
 30/10/17	11:00	13:00	Coding	Doing work for post search, thinking of implementing pagination but not sure how 
 30/10/17	20:00	22:30	Coding/Debugging	Finishe dup post search and debugged some issues 
-31/10/17	00:00	02:00	Debugging	Finishing touches before final submission 
+31/10/17	00:00	02:20	Debugging	Finishing touches before final submission 

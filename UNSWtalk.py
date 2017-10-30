@@ -34,12 +34,18 @@ def whoAmI():
 #replace all tags with name and links
 def addTags(message):
 	if(re.search("z\d+", message)): 
-			
+		
+		seen = set()
 		for tagged in re.findall("z\d+", message):
+			#if(re.search("/z\d+\"", tagged)): continue
+			
+			if(tagged not in seen): seen.add(tagged)
+			else: continue
+			
 			url = url_for('profile',zid=tagged)
 			repl = "<a href=\""+url+"\"><mark>@"+getName(tagged)+"</mark></a>"
 			message = message.replace(tagged,repl)
-			
+			print("")
 	return message
 
 #gets the name of the person by zid
@@ -78,20 +84,22 @@ def post(message=None, zid=None):
 	message = message.replace('\r','')
 	message = message.replace('\n','\\n')
 	
+	print("Posting message:",message)
+	
 	message = "message: " + message
 	sender = "from: " + me
 	time = "time: " + time
 	if(len(message) > 0):
 		path = os.path.join(students_dir,me)
-		recent = max([post for post in os.listdir(path) if re.search("^(\d)+.txt$",post)])
-		num = int(recent.replace('.txt','')) + 1
+		recent = max([int(post.replace('.txt','')) for post in os.listdir(path) if re.search("^(\d+).txt$",post)])
+		num = int(recent) + 1
 		new = str(num)+".txt"
 		check = os.path.join(path,new)
 		if(os.path.exists(check) is False):
 			with open(check,'w+') as f:
 				data = message+"\n"+sender+"\n"+time+"\n"
 				f.write(data)
-		else: print("File already exists !!!!")	
+		else: print("File exists post !")
 	
 	return redirect(url_for('profile',zid=me))
 
@@ -142,7 +150,6 @@ def friend(peer=None):
 			newFriends = myFriends.replace("("+peer+",",'(')
 			newFriends = myFriends.replace(", "+peer,'')
 			data = myData.replace(myFriends, newFriends)
-			print("deleted",peer)
 			try:
 				with open(myFile,'w') as f: f.write(data)
 			except Exception as e: print(e)
@@ -190,10 +197,8 @@ def friend(peer=None):
 
 			newFriends = peerFriends
 			if(re.match(", "+me,peerFriends)): 
-				print("matched the mid")
 				newFriends = peerFriends.replace(", "+me,'')
 			else: 
-				print("matched the end")
 				newFriends = peerFriends.replace(me+", ",'')
 
 			data = peerData.replace(peerFriends, newFriends)
@@ -206,7 +211,7 @@ def friend(peer=None):
 	else: action="UNDEFINED"
 	
 	
-	print("Friend button pressed:", peer, action)
+	#print("Friend button pressed:", peer, action)
 	return redirect(url_for('profile',zid=peer))
 
 @app.route('/results', methods=['POST'])
@@ -216,11 +221,10 @@ def results(action=None,search=None):
 	students = {}
 	
 	search = request.form.get('search','')
-	print("Searched :","\'"+search+"\'")
+	#print("Searched :","\'"+search+"\'")
 	search = search.lower()
 	
 	if(request.form.get('users')):
-		print("users")
 
 		#get dictionary of all users -- student['name'] = zid
 		for user in os.listdir(students_dir):
@@ -233,7 +237,6 @@ def results(action=None,search=None):
 	
 	
 	if(request.form.get('posts')):
-		print("posts")
 		
 		postList = []
 		commentList = []
@@ -286,12 +289,11 @@ def results(action=None,search=None):
 			try:
 				with open(path) as f:
 					data = f.read()
-			except Exception as e:
-				print("Content file",e)
+			except Exception as e: print("Content file",e)
 		
 			content = re.sub(".*?\/",'',path)
 			person = re.search("(z\d+)",path).group(1)
-			print(path, content, person)
+			#print(path, content, person)
 			sender = re.search("from: (\w+)",data).group(1)			#get zid
 			time = re.search("time: ([\w:\+\-]+)",data).group(1)	#get Date
 			m = re.search("message: (.*)",data)
@@ -540,7 +542,7 @@ def feed():
 	mentionCommentList = []
 	mentionReplyList = []
 	
-	'''
+	
 	#get a list of all files which have you tagged in it
 	others = [ student for student in os.listdir(students_dir) if student != me ]
 	mention = []
@@ -581,12 +583,11 @@ def feed():
 		try:
 			with open(path) as f:
 				data = f.read()
-		except Exception as e:
-			print("Content file",e)
+		except Exception as e: print("Content file",e)
 		
 		content = re.sub(".*?\/",'',path)
 		person = re.search("(z\d+)",path).group(1)
-		print(path, content, person)
+		#print(path, content, person)
 		sender = re.search("from: (\w+)",data).group(1)			#get zid
 		time = re.search("time: ([\w:\+\-]+)",data).group(1)	#get Date
 		m = re.search("message: (.*)",data)
@@ -623,11 +624,9 @@ def feed():
 	mentionPostList.sort(reverse=True)
 	mentionCommentList.sort(reverse=True)
 	mentionReplyList.sort(reverse=True)
-	'''
 	
 	num = (len(friendsPostList)//10) + 1
 	jsList = ["\"group"+str(i)+"\"" for i in range(num)]
-	print(jsList)
 	
 	return render_template('feed.html', 
 						   recent=recentPostList, 
@@ -656,7 +655,6 @@ def logout():
 def login():
 	#if session is active then redirect 
 	if 'zid' in session:
-		print("REDIRECTING")
 		return redirect(url_for('profile'), zid= whoAmI())
 	
 	#--- AUTO-LOGIN for easy debugging ---#
@@ -688,7 +686,8 @@ def login():
 	session['zid'] = zid
 	
 	# - redirect to home page / profile page
-	return redirect(url_for('feed'))
+	#return redirect(url_for('feed'))
+	return redirect(url_for('profile'))
 	
 #future functionality for registering
 #runs when the user fills out details and clicks on "Register"
@@ -719,8 +718,7 @@ def profile(zid=None):
 		 	    key = match.group(1)
 		 	    value = match.group(2)
 		 	    details[key] = value
-	except Exception as e:
-		print("In Profile "+e)
+	except Exception as e: print("In Profile "+e)
 	 		
     #if details not found then put default string
 	#"The user has chosen not so supply data for this field"
@@ -757,32 +755,19 @@ def profile(zid=None):
 		try:
 			with open(filename) as f:
 				data = f.read()
-		except Exception as e:
-			print("Content file",e)
+		except Exception as e: print("Content file",e)
 				
 		sender = re.search("from: (\w+)",data).group(1)			#get zid
 		time = re.search("time: ([\w:\+\-]+)",data).group(1)	#get Date
 		m = re.search("message: (.*)",data)
 		message = "" if(m is None) else m.group(1)				#get message
 		message = message.replace("\\n","<br \>")
+		message = addTags(message)
 		parent = None
 		root = None
 		self = re.search("-?(\d+)\.txt$",content).group(1)
 		type = "post"
 		
-
-		if(re.search("z\d+", message)): 
-			#print(getName(sender), message)
-			for tagged in re.findall("z\d+", message):
-				#tagged is still a zid here
-				#print(tagged,"-",getName(tagged))
-				
-				#need to replace tagged with repl
-				url = url_for('profile',zid=tagged)
-				repl = "<a href=\""+url+"\"><mark>@"+getName(tagged)+"</mark></a>"
-				message = message.replace(tagged,repl)
-				
-			#print("--------")
 		
 		#if its a comment then the parent number is left of slash
 		comment = re.compile('^\d+\-\d+\.txt$')
@@ -830,8 +815,7 @@ def my_utility_processor():
 					key = match.group(1)
 					value = match.group(2)
 					details[key] = value
-		except Exception as e:
-			print("In JINJA: "+e)
+		except Exception as e: print("In JINJA: "+e)
 				
 		#set default values
 		for field in all_possible_details:
