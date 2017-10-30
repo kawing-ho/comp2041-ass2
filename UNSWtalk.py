@@ -658,8 +658,8 @@ def login():
 		return redirect(url_for('profile'), zid= whoAmI())
 	
 	#--- AUTO-LOGIN for easy debugging ---#
-	session['zid'] = "z5196487"
-	return redirect(url_for('profile',zid="z5196487"))
+	#session['zid'] = "z5196487"
+	#return redirect(url_for('profile',zid="z5196487"))
 	#-------------------------------------#
 	
 	#sanitize input
